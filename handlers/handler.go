@@ -13,11 +13,11 @@ import (
 func GetPunches(c *gin.Context, dynamoClient *dynamodb.Client, logs configuration.GoAppTools) {
 	punches := make([]model.Punch, 0)
 
-	ponto := query.SelectPunch("Bianca", *dynamoClient, logs)
+	ponto := query.SelectPunch("Bia", *dynamoClient, logs)
 	punches = append(punches, ponto)
 	ponto = query.SelectPunch("Danilo", *dynamoClient, logs)
 	punches = append(punches, ponto)
-	ponto = query.SelectPunch("Patricia", *dynamoClient, logs)
+	ponto = query.SelectPunch("paty", *dynamoClient, logs)
 	punches = append(punches, ponto)
 	c.IndentedJSON(http.StatusOK, punches)
 

@@ -5,7 +5,6 @@ import (
 	"deli-ponto/configuration"
 	"deli-ponto/model"
 	"log"
-	"strconv"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
@@ -20,16 +19,9 @@ func InsertPunch(dynamoClient *dynamodb.Client, nome string, logs configuration.
 	datatemp, err := ntp.Time("a.st1.ntp.br")
 	configuration.Check(err, logs)
 
-	//formatando a data retornada do observatorio para a data no formato desejado (yy-mm-dd_hh:mm)
-	tempY := datatemp.Format("06")
-	tempM := datatemp.Format("01")
-	tempD := datatemp.Format("02")
-	tempH := strconv.Itoa(datatemp.Hour())
-	tempMin := strconv.Itoa(datatemp.Minute())
-
 	ponto := model.Punch{
 		Nome: nome,
-		Data: tempY + "-" + tempM + "-" + tempD + "_" + tempH + ":" + tempMin,
+		Data: datatemp.Format("2006-01-02_15:04:05"),
 	}
 
 	item, err := attributevalue.MarshalMap(ponto)

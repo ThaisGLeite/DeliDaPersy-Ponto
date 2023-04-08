@@ -27,15 +27,8 @@ func ResponseOK(c *gin.Context, app configuration.GoAppTools) {
 	c.IndentedJSON(http.StatusOK, "Servidor up")
 }
 
-func PostPunch(c *gin.Context, dynamoClient *dynamodb.Client, logs configuration.GoAppTools) {
-	var newPunch model.Punch
-
-	//configue o model punh with the retorn of context gin
-	err := c.BindJSON(&newPunch)
-	//faz a chacagem de errode forma unificada
-	configuration.Check(err, logs)
-	//calling the quiry package to mount the request for a DB
-	query.InsertPunch(dynamoClient, newPunch.Nome, logs)
-	name := ("ponto do colaborador " + newPunch.Nome + " batido")
-	c.IndentedJSON(http.StatusCreated, (name))
+func PostPunch(nome string, c *gin.Context, dynamoClient *dynamodb.Client, logs configuration.GoAppTools) {
+	query.InsertPunch(dynamoClient, nome, logs)
+	response := ("ponto do colaborador " + nome + " batido")
+	c.IndentedJSON(http.StatusCreated, response)
 }

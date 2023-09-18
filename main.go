@@ -43,8 +43,13 @@ func setupRouter() *gin.Engine {
 	return appRouter
 }
 
-// Para compilar o binario do sistema usamos: GOOS=linux GOARCH=amd64 go build -o ponto-app .
-// para criar o zip do projeto comando: zip lambda.zip ponto-app
+// Para compilar o binario do sistema usamos:
+//
+//	GOARCH=arm64 GOOS=linux  CGO_ENABLED=0 go build -tags lambda.norpc -o bootstrap .
+//
+// para criar o zip do projeto comando:
+//
+// zip lambda.zip bootstrap
 func main() {
 	logs = &configuration.GoAppTools{ // Initialized as pointer
 		InfoLogger:  log.New(os.Stdout, " ", log.LstdFlags|log.Lshortfile),

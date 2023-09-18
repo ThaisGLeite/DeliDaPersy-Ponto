@@ -5,11 +5,11 @@ import (
 )
 
 type GoAppTools struct {
-	ErrorLogger log.Logger
-	InfoLogger  log.Logger
+	ErrorLogger *log.Logger
+	InfoLogger  *log.Logger
 }
 
-func Check(erro error, app GoAppTools) {
+func Check(erro error, app *GoAppTools) {
 	if erro != nil {
 		app.ErrorLogger.Fatal(erro)
 	}

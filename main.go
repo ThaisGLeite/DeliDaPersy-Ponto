@@ -15,7 +15,7 @@ import (
 
 var (
 	dynamoClient *dynamodb.Client
-	logs         configuration.GoAppTools
+	logs         *configuration.GoAppTools
 )
 
 func inLambda() bool {
@@ -46,11 +46,11 @@ func setupRouter() *gin.Engine {
 // Para compilar o binario do sistema usamos: GOOS=linux GOARCH=amd64 go build -o ponto-app .
 // para criar o zip do projeto comando: zip lambda.zip ponto-app
 func main() {
-	InfoLogger := log.New(os.Stdout, " ", log.LstdFlags|log.Lshortfile)
-	ErrorLogger := log.New(os.Stdout, " ", log.LstdFlags|log.Lshortfile)
+	logs = &configuration.GoAppTools{ // Initialized as pointer
+		InfoLogger:  log.New(os.Stdout, " ", log.LstdFlags|log.Lshortfile),
+		ErrorLogger: log.New(os.Stdout, " ", log.LstdFlags|log.Lshortfile),
+	}
 
-	logs.InfoLogger = *InfoLogger
-	logs.ErrorLogger = *ErrorLogger
 	var err error
 	// chamada de função para a criação da sessao de login com o banco
 	dynamoClient, err = driver.ConfigAws()

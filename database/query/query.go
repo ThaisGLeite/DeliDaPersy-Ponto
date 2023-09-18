@@ -13,7 +13,7 @@ import (
 	"github.com/beevik/ntp"
 )
 
-func InsertPunch(dynamoClient *dynamodb.Client, nome string, logs configuration.GoAppTools) {
+func InsertPunch(dynamoClient *dynamodb.Client, nome string, logs *configuration.GoAppTools) {
 
 	//o codigo esta indo no observatorio nacional pegar a data e hora
 	datatemp, err := ntp.Time("a.st1.ntp.br")
@@ -35,7 +35,7 @@ func InsertPunch(dynamoClient *dynamodb.Client, nome string, logs configuration.
 	configuration.Check(err, logs)
 }
 
-func SelectPunch(Nome string, dynamoClient dynamodb.Client, app configuration.GoAppTools) model.Punch {
+func SelectPunch(Nome string, dynamoClient dynamodb.Client, app *configuration.GoAppTools) model.Punch {
 	query := expression.Name("Nome").Equal(expression.Value(Nome))
 	proj := expression.NamesList(expression.Name("Nome"), expression.Name("Data"))
 

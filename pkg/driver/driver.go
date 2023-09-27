@@ -23,8 +23,8 @@ func ConfigAws(logs *utils.GoAppTools) (*dynamodb.Client, error) {
 	// Load AWS configuration from shared credentials and config files
 	configAws, err := config.LoadDefaultConfig(
 		ctx,
-		config.WithSharedCredentialsFiles([]string{"../pkg/driver/data/credentials.aws"}),
-		config.WithSharedConfigFiles([]string{"../pkg/driver/data/config.aws"}),
+		config.WithSharedCredentialsFiles([]string{"pkg/driver/data/credentials.aws"}),
+		config.WithSharedConfigFiles([]string{"pkg/driver/data/config.aws"}),
 	)
 	if err != nil {
 		logs.Check(fmt.Errorf("failed to load AWS configuration: %w", err))

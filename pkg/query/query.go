@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/beevik/ntp"
 )
 
@@ -23,7 +24,7 @@ const TableName = "PontoColaborador"
 func InsertPunch(dynamoClient *dynamodb.Client, nome string, logs *utils.GoAppTools) {
 	// Fetch the current time from the National Observatory
 	currentTime, err := ntp.Time("a.st1.ntp.br")
-	logs.Check(err) // Using Check method from utils
+	logs.Check(err)
 
 	// Create a new punch record
 	punchRecord := model.Punch{
@@ -33,14 +34,14 @@ func InsertPunch(dynamoClient *dynamodb.Client, nome string, logs *utils.GoAppTo
 
 	// Serialize the punch record to a map
 	item, err := attributevalue.MarshalMap(punchRecord)
-	logs.Check(err) // Using Check method from utils
+	logs.Check(err)
 
 	// Insert the serialized record into DynamoDB
 	_, err = dynamoClient.PutItem(context.TODO(), &dynamodb.PutItemInput{
 		TableName: aws.String(TableName),
 		Item:      item,
 	})
-	logs.Check(err) // Using Check method from utils
+	logs.Check(err)
 }
 
 // SelectPunch fetches a punch record from DynamoDB based on the name.
@@ -63,14 +64,47 @@ func SelectPunch(nome string, dynamoClient *dynamodb.Client, app *utils.GoAppToo
 
 	// Execute the query
 	result, err := dynamoClient.Scan(context.TODO(), scanParams)
-	app.CheckAndPanic(err) // Using CheckAndPanic method from utils if you want to stop execution
+	app.CheckAndPanic(err)
 
 	// Deserialize the results
 	var punch model.Punch
 	for _, item := range result.Items {
 		err = attributevalue.UnmarshalMap(item, &punch)
-		app.CheckAndPanic(err) // Using CheckAndPanic method from utils if you want to stop execution
+		app.CheckAndPanic(err)
 	}
 
 	return punch
+}
+
+func SelectReport(nome string, periodo string, dynamoClient dynamodb.Client, logs *utils.GoAppTools) []model.Punch {
+	ctx := context.Background()
+
+	queryInput := &dynamodb.QueryInput{
+		TableName:              aws.String("PontoColaborador"),
+		KeyConditionExpression: aws.String("#Nome = :nome AND begins_with(#Data, :mes)"),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":nome": &types.AttributeValueMemberS{Value: nome},
+			":mes":  &types.AttributeValueMemberS{Value: periodo},
+		},
+		ExpressionAttributeNames: map[string]string{
+			"#Nome": "Nome",
+			"#Data": "Data",
+		},
+	}
+	queryOutput, err := dynamoClient.Query(ctx, queryInput)
+	logs.Check(err)
+
+	punchs := make([]model.Punch, 0)
+	for _, item := range queryOutput.Items {
+		punch := model.Punch{}
+		err := attributevalue.UnmarshalMap(item, &punch)
+		if err != nil {
+			// Handle the error
+			logs.Check(err)
+			continue
+		}
+		punchs = append(punchs, punch)
+	}
+
+	return punchs
 }

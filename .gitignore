@@ -1,1 +1,3 @@
-driver/data/*
+pkg/driver/data/*
+bootstrap
+lambda.zip
